@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>For Alvin — A Message from the Heart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --red: #CC0000;
+      --red-deep: #8B0000;
+      --red-glow: #FF2020;
+      --black: #0A0A0A;
+      --gold: #C9A84C;
+      --gold-light: #F0D080;
+      --white: #FAF8F4;
+      --cream: #F2EDE4;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ─── GRAIN OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* ─── ANIMATED BG ─── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: radial-gradient(ellipse 80% 60% at 20% 10%, #3a0000 0%, transparent 60%),
+                  radial-gradient(ellipse 60% 50% at 80% 80%, #1a0000 0%, transparent 60%),
+                  radial-gradient(ellipse 100% 100% at 50% 50%, #0A0A0A 40%, #110000 100%);
+      animation: bgPulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgPulse {
+      0%   { opacity: 1; }
+      100% { background: radial-gradient(ellipse 80% 60% at 30% 20%, #4a0000 0%, transparent 60%),
+                         radial-gradient(ellipse 60% 50% at 70% 70%, #200000 0%, transparent 60%),
+                         radial-gradient(ellipse 100% 100% at 50% 50%, #0A0A0A 40%, #150000 100%); }
+    }
+
+    /* ─── INTRO SCREEN ─── */
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #intro.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .eagle-svg {
+      width: 120px;
+      animation: eaglePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes eaglePulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px #CC0000AA); }
+      50%       { transform: scale(1.05); filter: drop-shadow(0 0 25px #FF2020CC); }
+    }
+
+    .intro-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      color: var(--gold-light);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.5s forwards;
+    }
+
+    .open-btn {
+      margin-top: 1rem;
+      padding: 1rem 3rem;
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      color: var(--gold-light);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.4s ease;
+      opacity: 0;
+      animation: fadeUp 1s ease 1s forwards;
+    }
+
+    .open-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+      z-index: -1;
+    }
+
+    .open-btn:hover { color: var(--black); }
+    .open-btn:hover::before { transform: translateX(0); }
+
+    /* ─── MAIN CONTENT ─── */
+    main {
+      position: relative;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    main.visible { opacity: 1; }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-top-line {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: none;
+    }
+
+    .hero-top-line.animate { animation: fadeUp 1s ease 0.2s forwards; }
+
+    .line-decor {
+      height: 1px;
+      width: 60px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+
+    .line-decor.right { background: linear-gradient(to left, transparent, var(--gold)); }
+
+    .hero-subtitle {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 10vw, 8rem);
+      font-weight: 900;
+      line-height: 0.9;
+      color: var(--white);
+      opacity: 0;
+    }
+
+    .hero-title.animate { animation: fadeUp 1s ease 0.4s forwards; }
+
+    .hero-title span {
+      color: var(--red);
+      font-style: italic;
+      display: block;
+      -webkit-text-stroke: 1px var(--red);
+      text-shadow: 0 0 60px #CC000066, 0 0 120px #CC000033;
+    }
+
+    .hero-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 5vw, 3.5rem);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--gold-light);
+      margin-top: 1.5rem;
+      opacity: 0;
+    }
+
+    .hero-name.animate { animation: fadeUp 1s ease 0.6s forwards; }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeIn 1s ease 2s forwards;
+    }
+
+    .scroll-hint span {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #ffffff44;
+    }
+
+    .scroll-arrow {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 1.5s ease infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 1; transform: scaleY(1); }
+      50%       { opacity: 0.4; transform: scaleY(0.7); }
+    }
+
+    /* ─── SECTIONS ─── */
+    .section {
+      padding: clamp(4rem, 10vw, 8rem) clamp(1.5rem, 5vw, 8rem);
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--red-deep), transparent);
+      max-width: 120px;
+    }
+
+    /* ─── MESSAGE CARD ─── */
+    .message-card {
+      background: linear-gradient(135deg, #ffffff08 0%, #ffffff04 100%);
+      border: 1px solid #ffffff0f;
+      border-left: 3px solid var(--red);
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .message-card::before {
+      content: '"';
+      position: absolute;
+      top: -1rem;
+      left: 2rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 8rem;
+      color: var(--red);
+      opacity: 0.12;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .message-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 300;
+      line-height: 1.9;
+      color: var(--cream);
+      position: relative;
+      z-index: 1;
+    }
+
+    .message-text p { margin-bottom: 1.5rem; }
+    .message-text p:last-child { margin-bottom: 0; }
+
+    /* ─── QUOTE BLOCK ─── */
+    .quote-block {
+      margin: 5rem auto;
+      padding: 0 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .quote-line {
+      width: 60px;
+      height: 2px;
+      background: var(--red);
+      margin: 0 auto 2.5rem;
+    }
+
+    .quote-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.5;
+      max-width: 680px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .quote-text em {
+      color: var(--gold-light);
+      font-style: normal;
+    }
+
+    .quote-source {
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* ─── MILESTONE CARDS ─── */
+    .milestones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .milestone {
+      padding: 2rem;
+      border: 1px solid #ffffff0d;
+      background: #ffffff05;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .milestone:hover {
+      border-color: var(--red-deep);
+      transform: translateY(-4px);
+    }
+
+    .milestone::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--red), transparent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .milestone:hover::after { transform: scaleX(1); }
+
+    .milestone-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--red);
+      opacity: 0.25;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .milestone-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+
+    .milestone-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: var(--cream);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin: 6rem auto;
+      max-width: 400px;
+      padding: 0 2rem;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #ffffff1a, transparent);
+    }
+
+    .divider-icon { color: var(--gold); font-size: 1rem; opacity: 0.6; }
+
+    /* ─── CLOSING ─── */
+    .closing {
+      text-align: center;
+      padding: 6rem 2rem;
+      position: relative;
+    }
+
+    .closing-from {
+      font-size: 0.7rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: #ffffff33;
+      margin-bottom: 1rem;
+    }
+
+    .closing-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-style: italic;
+      color: var(--white);
+    }
+
+    .closing-tagline {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.7;
+    }
+
+    /* ─── RED GLOW ACCENT ─── */
+    .glow-accent {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── ART OF WAR BLOCKS ─── */
+    .artofwar-block {
+      border: 1px solid #ffffff0d;
+      border-left: 3px solid var(--gold);
+      padding: 2rem 2rem 2rem 2.5rem;
+      background: linear-gradient(135deg, #C9A84C08 0%, transparent 100%);
+      position: relative;
+    }
+
+    .artofwar-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .artofwar-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .artofwar-src {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.6;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid #ffffff08;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: #ffffff1a;
+      text-transform: uppercase;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      .message-card { padding: 2rem 1.5rem; }
+      .milestones { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<!-- INTRO SCREEN -->
+<div id="intro">
+  <img 
+    class="eagle-svg" 
+    src="https://upload.wikimedia.org/wikipedia/en/thumb/8/8f/Al_Ahly_SC_logo.svg/1200px-Al_Ahly_SC_logo.svg.png"
+    alt="Al Ahly"
+    style="width:120px; height:120px; object-fit:contain;"
+  />
+
+  <p class="intro-text">A message awaits you</p>
+  <button class="open-btn" onclick="openMessage()">Open Your Gift →</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="glow-accent" style="width:500px;height:500px;background:#CC000022;top:-100px;left:-100px;"></div>
+    <div class="glow-accent" style="width:400px;height:400px;background:#CC000015;bottom:0;right:-50px;"></div>
+
+    <div class="hero-top-line animate" id="heroLine">
+      <div class="line-decor"></div>
+      <span class="hero-subtitle">Three months · Countless lessons</span>
+      <div class="line-decor right"></div>
+    </div>
+
+    <h1 class="hero-title animate" id="heroTitle">
+      Thank
+      <span>You,</span>
+    </h1>
+    <p class="hero-name animate" id="heroName">Alvin.</p>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="divider reveal">
+    <div class="divider-line"></div>
+    <span class="divider-icon">✦</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- THE MESSAGE -->
+  <section class="section">
+    <div class="section-label reveal">The Message</div>
+    <div class="message-card reveal">
+      <div class="message-text">
+        <p>Thank you for all the additions and support over the past three months we've worked together. You've truly been an amazing manager who always adds value.</p>
+        <p>You gave me more than one book — even though I'm not really into reading — but they actually helped me a lot. One quote from <em>Outliers</em> really stuck with me: <strong>"The thing you fear the most is exactly what you should throw yourself into."</strong> Because of that, I started learning swimming, and I'm still improving.</p>
+        <p>You also gave me the idea for a work-related game, and I kept developing it until I started taking courses — and now I'm about to become a junior developer.</p>
+        <p>This is just a small gift, and I hope you like it.</p>
+        <p style="margin-top: 2rem; font-style: italic; color: var(--gold-light);">Thank you for everything.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <div class="quote-block section reveal">
+    <div class="quote-line"></div>
+    <p class="quote-text">
+      "The thing you fear the most is exactly what you should<br>
+      <em>throw yourself into."</em>
+    </p>
+    <p class="quote-source">Malcolm Gladwell — Outliers</p>
+  </div>
+
+  <!-- MILESTONES -->
+  <section class="section">
+    <div class="section-label reveal">What You Sparked in Me</div>
+    <div class="milestones">
+      <div class="milestone reveal">
+        <div class="milestone-num">01</div>
+        <div class="milestone-title">Facing Fear</div>
+        <div class="milestone-desc">Started learning to swim — something I always feared. Still going.</div>
+      </div>
+      <div class="milestone reveal">
+        <div class="milestone-num">02</div>
+        <div class="milestone-title">Building Something Real</div>
+        <div class="milestone-desc">Took a game idea you gave me and turned it into an actual project.</div>
+      </div>
+      <div class="milestone reveal">
+        <div class="milestone-num">03</div>
+        <div class="milestone-title">Becoming a Developer</div>
+        <div class="milestone-desc">Enrolled in courses, kept building — now almost a junior developer.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="divider reveal">
+    <div class="divider-line"></div>
+    <span class="divider-icon">✦</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- ART OF WAR QUOTES -->
+  <section class="section">
+    <div class="section-label reveal">Words That Cut Through</div>
+
+    <div class="artofwar-block reveal">
+      <div class="artofwar-num">I</div>
+      <p class="artofwar-text">"Opportunities multiply as they are seized."</p>
+      <p class="artofwar-src">Sun Tzu — The Art of War</p>
+    </div>
+
+    <div class="artofwar-block reveal" style="margin-top: 2rem;">
+      <div class="artofwar-num">II</div>
+      <p class="artofwar-text">"Victorious warriors win first and then go to war, while defeated warriors go to war first and then seek to win."</p>
+      <p class="artofwar-src">Sun Tzu — The Art of War</p>
+    </div>
+  </section>
+
+  <!-- DIVIDER -->
+  <section class="closing reveal">
+    <div class="glow-accent" style="width:600px;height:300px;background:#CC000018;bottom:0;left:50%;transform:translateX(-50%);"></div>
+    <div class="quote-line" style="margin: 0 auto 2.5rem;"></div>
+    <p class="quote-text" style="font-size: clamp(1rem, 2.5vw, 1.6rem); max-width: 600px; margin: 0 auto 1.5rem;">"No one who can rise before dawn 360 days a year<br>fails to make his family rich."</p>
+    <p class="closing-tagline">Malcolm Gladwell — Outliers</p>
+  </section>
+
+</main>
+
+<footer>
+  Made with gratitude · Three months that changed everything
+</footer>
+
+<script>
+  function openMessage() {
+    document.getElementById('intro').classList.add('hidden');
+    const main = document.getElementById('main');
+    main.classList.add('visible');
+
+    // Trigger hero animations
+    setTimeout(() => {
+      document.getElementById('heroLine').style.animation = 'fadeUp 1s ease forwards';
+      document.getElementById('heroTitle').style.animation = 'fadeUp 1s ease 0.2s forwards';
+      document.getElementById('heroName').style.animation = 'fadeUp 1s ease 0.4s forwards';
+    }, 100);
+
+    // Start scroll observer
+    initScrollObserver();
+  }
+
+  function initScrollObserver() {
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, 100 * i);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    reveals.forEach(el => observer.observe(el));
+  }
+</script>
+</body>
+</html>
